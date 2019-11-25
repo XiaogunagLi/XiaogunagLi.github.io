@@ -1,0 +1,92 @@
+<html>
+<head>
+<script>
+
+var ctx;
+var x = 50;
+var y = 0;
+var move = 0;
+var lastTime = 0;
+window.onload = function() {
+	ctx = document.getElementById("canvas").getContext("2d");
+	
+	// shim layer with setTimeout fallback
+	window.requestAnimFrame = (function(){
+	  return  window.requestAnimationFrame || 
+			  window.webkitRequestAnimationFrame || 
+			  window.mozRequestAnimationFrame || 
+			  window.oRequestAnimationFrame || 
+			  window.msRequestAnimationFrame || 
+			  function(callback){
+				window.setTimeout(callback, 1000/1000);
+			  };
+	})();
+	 
+	animloop();
+}
+
+	function animloop(){
+	  if(move == 1){
+	   refresh();
+	  }
+	 
+	  requestAnimFrame(animloop);
+	  
+	}
+	
+function refresh(){
+    frameUpdate();
+	ctx.clearRect(0,0,1200,600);
+
+	var img = document.getElementById("scream");
+	
+	for(var i=0; i< 1; i++){
+		for(var j=0; j<1; j++){
+			ctx.drawImage(img, x+60*j, y+60*i, 50, 50);
+		}
+	}
+	x = x + 2;
+
+}
+
+function start(){
+	move = 1;
+}
+
+function stop(){
+	x = 50;
+}
+
+function frameUpdate(){
+	if(lastTime == 0){
+		lastTime = Date.now();
+	}else{
+		var now = Date.now();
+		var f = 1000/(now-lastTime);
+		f = f.toFixed(2);
+		console.log(f);
+		
+		lastTime = Date.now();
+	}
+}
+
+</script>
+</head>
+<body>
+<canvas id="canvas" width="1200" height = "600" style="border:1px solid red">
+</canvas>
+
+<button onclick="start()">start</button>
+<button onclick="stop()">stop</button>
+
+<img id="scream" width="100" height="100" src="1.jpg" style="display:none;">
+
+
+	
+	 
+
+
+
+
+</body>
+</html>
