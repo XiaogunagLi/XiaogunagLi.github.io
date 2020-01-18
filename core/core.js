@@ -1,5 +1,5 @@
 //舞台
-var runPlace = 2;// 1手机 2浏览器
+var runPlace = 1;// 1手机 2浏览器
 var res = new Map();
 var stage;
 var clickDown = false;
@@ -67,6 +67,7 @@ function Stage() {
 						continue;
 						}
 						if(c.type == BUTTON){
+							alert("BUTTON clickdown start!");
 							if(ex > (c.x + layer.x + scene.x)*scene.sScale && ex < (c.x + layer.x + scene.x)*scene.sScale + c.defaultImage.width*scene.sScale && ey > (c.y + layer.y + scene.y)*scene.sScale && ey < (c.y + layer.y + scene.y)*scene.sScale + c.defaultImage.height*scene.sScale){
 								c.clickDown();
 							}
@@ -269,6 +270,7 @@ function Button(x, y, defaultImage, clickImage, func) {
 	this.clickDown = function() {
 		this.defaultImage = this.clickImage;
 		this.press = true;
+		alert("BUTTON inner clickdown start!");
 		this.func();
 
 	};
@@ -395,6 +397,7 @@ function start(){
 			var _touch = e.originalEvent.targetTouches[0]; 
 		    var ex = _touch.pageX - this.offsetLeft;
 		    var ey = _touch.pageY - this.offsetTop + $(document).scrollTop();
+		    alert("canvas touch start!");
 			stage.clickDown(ex, ey);
 		});
 		$("#canvas").bind("touchend", function(e){

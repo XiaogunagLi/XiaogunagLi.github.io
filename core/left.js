@@ -708,6 +708,6 @@ function addRkey(num){
 
 function musicOk(type){
 	if(runPlace == 1){
-		JA.music(type);
+		// JA.music(type);
 	}
 }
