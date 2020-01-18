@@ -1,5 +1,5 @@
 //舞台
-var runPlace = 2;// 1手机 2浏览器
+var runPlace = 1;// 1手机 2浏览器
 var res = new Map();
 var stage;
 var clickDown = false;
