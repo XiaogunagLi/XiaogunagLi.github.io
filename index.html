@@ -1,27 +1,214 @@
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <title>index.html</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
     <meta http-equiv="description" content="this is my page">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<script type="text/javascript" src="tween.js"></script>
-	<script type="text/javascript" src="core.js"></script>
-	<script type="text/javascript" src="effect.js"></script>
-	<script type="text/javascript" src="main.js"></script>
-	
-	<script>
-		window.onload = function() {
-			loadImages(sources,start);
-		}
+	<script type="text/javascript" src="core/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="core/tool.js"></script>
+	<script type="text/javascript" src="core/load.js"></script>
+	<script type="text/javascript" src="core/core.js"></script>
+	<script type="text/javascript" src="core/constant.js"></script>
+	<script type="text/javascript" src="core/item.js"></script>
+	<script type="text/javascript" src="core/monster.js"></script>
+	<script type="text/javascript" src="core/map.js"></script>
+	<script type="text/javascript" src="core/main.js"></script>
+	<script type="text/javascript" src="core/left.js"></script>
+	<script type="text/javascript" src="core/queryMonsterData.js"></script>
+	<style type="text/css">
+		*{margin:0px;padding:0px;}
+	</style>
+  </head>
+  	<script type="text/javascript">
+  	
+  	//window.location.href = "http://192.168.0.102:8080/webGame/2.html";
+  	//var url = window.location.href;
+  	//if(url == "http://192.168.0.102:8080/webGame/2.html"){
+  	//	window.location.href = "http://192.168.0.102:8080/webGame/2.html?data=1";
+  	//}
+  	
+  	var tempScale = 1;
+  		$(window).load(function(){
+	  		var w = $(window).width();
+			var h = $(window).height();
+			
+			//左侧放缩比例
+			leftScale = h/STAGEH;
+			LEFT_WIDTH *= leftScale;
+			
+			LEFT_ALL_WIDTH = w*STAGEH/h;
+			
+			//游戏放缩比例
+			scale = (w-LEFT_WIDTH)/STAGEW;
+			
+			//游戏画布大小
+  			$("#canvas").attr("width", w);
+  			$("#canvas").attr("height", h);
+  			
+  			//游戏舞台大小
+  			SCREEN_WIDTH = w - LEFT_WIDTH;
+  			SCREEN_HEIGHT = h;
+  			
+  			battlePIni();
+  			menuIni();
+  			
+			//变量初始化
+			monsterData = new Map();
+			flootLayer = new Array();
+			
+  		})
+  		
+  		function newGame(){
+  			flootData = [floot1, floot2, floot3, floot4, floot5, floot6, floot7, 
+						 floot8, floot9, floot10, floot11, floot12, floot13, floot14,
+						 floot15, floot16, floot17, floot18, floot19, floot20, floot21];
+  			
+  			var sData = new spriteData();
+  			monsterData.put(10000, sData);
+  			
+  			$("#canvas").css("display", "block");
+  			$("#menu").css("display", "none");
+  			start();
+  		}
+  		
+  		function loadGame(){
+  			var str = JA.load();
+  			
+  			if(str == ""){
+  				newGame();
+  				return;
+  			}
+
+			flootData = new Array();
+			
+			var item1 = str.split("#");
+ 			
+  			for(var i=0; i<item1.length - 1; i++){
+  				var item2 = item1[i].split(";");
+  				
+  				var flootItem = new Array();
+  				for(var j=0 ;j<item2.length; j++){
+  					var item3 = item2[j].split(",");
+  					
+  					var row = new Array();
+  					for(var k=0; k<item3.length; k++){
+  						row.push(item3[k]);
+  					}
+  					
+  					flootItem.push(row);
+  				}
+  				
+  				flootData.push(flootItem);
+  			}
+  			
+  			var sp = item1[item1.length - 1].split(",");
+  			
+  			var sData = new spriteData();
+  			sData.level = Number(sp[0]);
+  			sData.attack = Number(sp[1]);//1
+			sData.defend = Number(sp[2]);//2
+			sData.blood = Number(sp[3]);//3
+			
+			sData.gold = Number(sp[4]);//4
+			sData.exp = Number(sp[5]);//5
+			
+			sData.rKey = Number(sp[6]);//6
+			sData.bKey = Number(sp[7]);//7
+		    sData.oKey = Number(sp[8]);//8
+		    
+		    sData.ax = Number(sp[9]);//9
+		    sData.skip = Number(sp[10]);//10
+		    sData.gwxx = Number(sp[11]);//11
+		    
+		    currentFloot = Number(sp[12]);//12
+		    
+		    sData.szj = Number(sp[13]);//13
+		    
+			monsterData.put(10000, sData);
+  			
+  			$("#canvas").css("display", "block");
+  			$("#menu").css("display", "none");
+  			start();
+  		}
+  		
+  		function save(){
+  			if(runPlace == 2){
+  				return;
+  			}
+  			var str = "";
+  			for(var k=0; k<flootLayer.length; k++){
+  		
+			  	//添加每一层的数据
+			  	for(var i=0; i<flootData[k].length; i++){
+			  		var item = flootData[k][i];
+			  		
+			  		for(var j=0; j<item.length; j++){
+		  				str += item[j];
+		  				if(j != item.length - 1){
+		  					str += ",";
+		  				}
+		  			}
+			  		if(i != flootData[k].length - 1){
+			  			str += ";";
+			  		}
+			  	}
+			  	//if(k != flootLayer.length - 1){
+			  		str += "#";
+			  	//}
+  			}
+  			
+  			var sData = monsterData.get(10000);
+  			
+  			var sDataStr = sData.level + "," + sData.attack + "," + sData.defend + "," + sData.blood + ","
+  			+ sData.gold + "," + sData.exp + "," + sData.rKey + "," + sData.bKey + "," + sData.oKey + ","
+  			+ sData.ax + "," + sData.skip + "," + sData.gwxx + "," + currentFloot + "," + sData.szj; 
+  			
+  			str += sDataStr;
+  			
+  			var saveState = JA.insert(str); 
+  		}
 	</script>
 	<style>
-		html { overflow-y: hidden; overflow-x: hidden; }
-		body {display: block; margin: 0px;}
+		.menu{
+		   position: absolute; 
+		   left: 0px; 
+		   top: 0px; 
+		   border: solid 0px #f00; 
+		  /* background-image: url('images/poster.jpg');*/
+		  /* background-repeat:no-repeat;*/
+		   /*background-size:100px;*/
+		}
 	</style>
-	
-</head>
-<body id="bd">
-		<canvas id="canvas" style="border:1px solid red; position:absolute;">
-		</canvas>
-
-</body>
+  <body style="overflow-x:hidden; overflow-y:hidden; background-image: url('images/gameleft.jpg');">
+		<canvas  id="canvas" width="840" height="660" style = "float:left;position: absolute; display: none;">不支持</canvas>
+  		
+  		<div id="battleP" style="width:272px; height:168px; background-image:url('images/battleBg.png'); position: absolute; border: solid 0px #f00; display: none;">
+  			<!--敌方-->
+  			<label id="mName" style="position:absolute; left: 48px; top:22px; font-size: 14px;font-weight:bold; color: #996633;">小白猪</label>
+  			<img   id="mImg" src="images/m2_0.png" style="position:absolute; left: 38px; top:42px;">
+  			<label id="mBlood" style="position:absolute; left: 48px; top:105px; font-size: 12px; color: #f00;">血 量 199</label>
+  			<label id="mAttack" style="position:absolute; left: 48px; top:125px; font-size: 12px; color: #996633;">攻 击 199</label>
+  			<label id="mDeffend" style="position:absolute; left: 48px; top:145px; font-size: 12px; color: #996633;">防 御 199</label>
+  		
+  			<img id="success" src="images/battleRbg.png" style="position: absolute; left: 80px; top: 35px; display: none;">
+  		
+  			<!--sprite-->
+   			<label id="sName" style="position:absolute; left: 184px; top:22px; font-size: 14px;font-weight:bold; color: #996633;">小白猪</label>
+  			<img   id="sImg"src="images/sprite_down0.png" style="position:absolute; left: 174px; top:42px;">
+  			<label id="sBlood"style="position:absolute; left: 184px; top:105px; font-size: 12px; color: #f00;">血 量 199</label>
+  			<label id="sAttack" style="position:absolute; left: 184px; top:125px; font-size: 12px; color: #996633;">攻 击 199</label>
+  			<label id="sDeffend"style="position:absolute; left: 184px; top:145px; font-size: 12px; color: #996633;">防 御 199</label>
+  		</div>
+  		
+  		<div class="menu" id="menu">
+  			<img id="menuBg" src="images/poster.jpg"  style=" position: absolute; left: 0px;  top: 0px; ">
+  			
+  			<img id="start" onclick="newGame()" src="images/m_start1.png"  style=" position: absolute; left: 0px;  top: 0px; opacity:0.0;">
+  			<img id="load" onclick="newGame()" src="images/m_start1.png"  style=" position: absolute; left: 110px;  top: 0px; ">
+  			<img id="about" onclick="newGame()" src="images/m_start1.png"  style=" position: absolute; left: 110px;  top: 0px; opacity:0.0;">
+  				
+  		</div>
+  </body>
 </html>
