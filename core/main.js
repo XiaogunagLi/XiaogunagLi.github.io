@@ -438,7 +438,7 @@ function openBattleLayer(row, col){
 	
 	if(runPlace == 1){
 		//战斗音乐
-		// JA.battlePlay();
+		JA.battlePlay();
 	}
 	
 	
@@ -498,7 +498,7 @@ function openBattleLayer(row, col){
 		  		
 		  		if(runPlace == 1){
 		  			//战斗音乐
-		  			// JA.battleStop();
+		  			JA.battleStop();
 		  		}
 		  		
 		  	},1000);
@@ -517,7 +517,7 @@ function gameFlush(){
 		fixSpritePosition();
 		if(runPlace == 1){
 			//音乐结束
-			// JA.walkStop();
+			JA.walkStop();
 		}
 		
 		return;
@@ -529,7 +529,7 @@ function gameFlush(){
 	if(currentDir != -1){
 		if(runPlace == 1){
 			//音乐开始
-			// JA.walkPlay();
+			JA.walkPlay();
 		}
 	}
 
